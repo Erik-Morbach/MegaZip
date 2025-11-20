@@ -48,6 +48,7 @@ namespace MonitorTask {
 		Com decompressCom;
 		bool running;
 		RunMode mode;
+		int idx;
 	};
 
 	Ctx ctx;
@@ -66,6 +67,7 @@ namespace MonitorTask {
 		MonitorTask::finish();
 	}
 	void setup(std::vector<std::string> args){
+		ctx.idx = 0;
 		ctx.compressCom.buffer = "";
 		ctx.decompressCom.buffer = "";
 		ctx.running = true;
@@ -73,6 +75,10 @@ namespace MonitorTask {
 						(args[0].compare("-d")?DECOMPRESS:NONE);
 		ctx.compressCom.inputPath = ctx.decompressCom.inputPath = args[1];
 		ctx.compressCom.outputPath = ctx.decompressCom.outputPath = args[2];
+		pipe(ctx.compressCom.fd);
+		pipe(ctx.decompressCom.fd);
+		close(ctx.compressCom.fd[1]);
+		close(ctx.decompressCom.fd[1]);
 
 		if(fork() == 0) {
 			CompressTask::com = ctx.compressCom;
@@ -81,6 +87,7 @@ namespace MonitorTask {
 				CompressTask::run();
 			else
 				DecompressTask::decompress();
+			exit(0);
 		}
 	}
 	void update(){
@@ -88,16 +95,15 @@ namespace MonitorTask {
 		MonitorTask::getStatusFromProcess();
 	}
 	void updateScreen() {
-		static int idx = 0;
-		printf("Espere o processo finalizar: %c\r", "-/|\\"[idx++]);
-		idx %= 4;
+		printf("Espere o processo finalizar: %c \r", "-/|\\"[((ctx.idx++)/40000)%4]);
+		fflush(stdout);
 	}
 	void getStatusFromProcess() {
 		char buffer[50];
 		int fd = ctx.mode == RunMode::COMPRESS ?
 					ctx.compressCom.fd[0] :
 					ctx.decompressCom.fd[0];
-		read(fd, buffer, sizeof(buffer));	
+		int result = read(fd, buffer, sizeof(buffer));	
 
 		ctx.running = strlen(buffer) == 0;
 		if(!ctx.running){
