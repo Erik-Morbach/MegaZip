@@ -9,6 +9,7 @@
 #include <limits>
 #include <mutex>
 #include <ostream>
+#include <sstream>
 #include <queue>
 #include <string_view>
 #include <thread>

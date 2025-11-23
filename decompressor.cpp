@@ -58,7 +58,7 @@ void DecompressorTask::decompress() {
 	}
 
 	bytes_written = out_file.tellp();
-	std::stringstream ss;
+	std::ostringstream ss;
 	ss << "Input size:      " << bytes_read << " bytes\n";
 	ss << "Compressed size: " << bytes_written << " bytes\n";
 	ss << "Ratio:           " << ((bytes_written) / static_cast<double>(bytes_read)) << "x\n";

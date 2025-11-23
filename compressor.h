@@ -4,6 +4,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <fstream>
+#include <sstream>
 #include <ios>
 #include <iostream>
 #include <limits>
