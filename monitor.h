@@ -19,17 +19,12 @@ struct MonitorTask {
 	struct Ctx {
 		IPCData compressCom;
 		IPCData decompressCom;
-		bool running;
 		RunMode mode;
-		int idx;
 	};
 
 	Ctx ctx;
 	void main(std::vector<std::string> args);
 	void setup(std::vector<std::string> args);
-	void update();
 	void finish();
-	void updateScreen();
-	void getStatusFromProcess();
 	void readAllFds();
 };

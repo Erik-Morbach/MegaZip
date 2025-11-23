@@ -6,10 +6,8 @@ void MonitorTask::main(std::vector<std::string> args){
 	this->finish();
 }
 void MonitorTask::setup(std::vector<std::string> args){
-	ctx.idx = 0;
 	ctx.compressCom.buffer = "";
 	ctx.decompressCom.buffer = "";
-	ctx.running = true;
 	ctx.mode = args[1].compare("-c")==0 ? COMPRESS : 
 					(args[1].compare("-d")==0?DECOMPRESS:NONE);
 	ctx.compressCom.inputPath = ctx.decompressCom.inputPath = args[2];

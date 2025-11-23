@@ -7,8 +7,6 @@
 #include <iostream>
 #include <ctime>
 
-
-
 #include "monitor.h"
 
 
