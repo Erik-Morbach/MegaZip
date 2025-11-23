@@ -22,11 +22,6 @@ int main(int argc, const char *argv[]){
 		args.push_back(argv[i]);
 	}
 
-	std::cout << "Parametros: ";
-	for(std::string w: args){
-		std::cout <<"|" <<w << "|";
-	}
-	std::cout << std::endl;
 	MonitorTask task;
 	task.main(args);
 	return 0;
