@@ -12,7 +12,7 @@
 #include "compressor.h"
 #include "decompressor.h"
 
-namespace MonitorTask {
+struct MonitorTask {
 	enum RunMode {
 		COMPRESS, DECOMPRESS, NONE
 	};
@@ -31,4 +31,5 @@ namespace MonitorTask {
 	void finish();
 	void updateScreen();
 	void getStatusFromProcess();
+	void readAllFds();
 };

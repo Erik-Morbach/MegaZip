@@ -17,8 +17,21 @@
 
 #include "utils.h"
 
-namespace CompressorTask {
+struct CompressorTask {
 	IPCData com;
+	std::condition_variable read_cv;
+	std::mutex read_mutex;
+	bool done_reading = false;
+
+	std::condition_variable compress_cv;
+	std::mutex compress_mutex;
+	bool done_compressing = false;
+
+	std::queue<std::string> in_queue;
+	std::queue<char> out_queue;
+
+	uint64_t bytes_read, bytes_written;
+
 	void run();
 	void read();
 	void compress();

@@ -17,7 +17,8 @@
 
 #include "utils.h"
 
-namespace DecompressorTask {
+struct DecompressorTask {
 	IPCData com;
+	uint64_t bytes_read, bytes_written;
 	void decompress();
 };
