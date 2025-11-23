@@ -3,9 +3,6 @@
 
 void MonitorTask::main(std::vector<std::string> args){
 	this->setup(args);
-	while(ctx.running){
-		this->update();
-	}
 	this->finish();
 }
 void MonitorTask::setup(std::vector<std::string> args){
@@ -19,10 +16,10 @@ void MonitorTask::setup(std::vector<std::string> args){
 	ctx.compressCom.outputPath = ctx.decompressCom.outputPath = args[3];
 	pipe(ctx.compressCom.fd);
 	pipe(ctx.decompressCom.fd);
-	close(ctx.compressCom.fd[1]);
-	close(ctx.decompressCom.fd[1]);
 
 	if(fork() == 0) {
+		close(ctx.compressCom.fd[0]);
+		close(ctx.decompressCom.fd[0]);
 		if(ctx.mode == COMPRESS) {
 			CompressorTask task;
 			task.com = this->ctx.compressCom;
@@ -35,45 +32,26 @@ void MonitorTask::setup(std::vector<std::string> args){
 		}
 		exit(0);
 	}
-}
-void MonitorTask::update(){
-	this->updateScreen();
-	this->getStatusFromProcess();
-}
-void MonitorTask::updateScreen() {
-	printf("Espere o processo finalizar: %c \r", "-/|\\"[(abs(ctx.idx++)/40000)%4]);
-	fflush(stdout);
-}
-void MonitorTask::getStatusFromProcess() {
-	char buffer[50];
-	int fd = ctx.mode == RunMode::COMPRESS ?
-				ctx.compressCom.fd[0] :
-				ctx.decompressCom.fd[0];
-	int result = read(fd, buffer, sizeof(buffer));	
-
-	if(result != 0)
-		std::cout << "Leu "<< result << std::endl;
-	ctx.running = strlen(buffer) == 0;
-	std::cout << "Read on "<<fd<<std::endl;
-	if(!ctx.running){
-		(
-			ctx.mode == RunMode::COMPRESS ? 
-			ctx.compressCom.buffer :
-			ctx.decompressCom.buffer
-		) += buffer;
+	else{
+		close(ctx.compressCom.fd[1]);
+		close(ctx.decompressCom.fd[1]);
 	}
 }
 void MonitorTask::readAllFds() {
-	char buffer[1000];
-	read(ctx.compressCom.fd[0], buffer, sizeof(buffer));
-	ctx.compressCom.buffer += buffer;
-	read(ctx.decompressCom.fd[0], buffer, sizeof(buffer));
-	ctx.decompressCom.buffer += buffer;
+	char buffer[1000] = {0};
+	if(ctx.mode == COMPRESS){
+		read(ctx.compressCom.fd[0], buffer, sizeof(buffer));
+		ctx.compressCom.buffer += buffer;
+	}
+	else{
+		read(ctx.decompressCom.fd[0], buffer, sizeof(buffer));
+		ctx.decompressCom.buffer += buffer;
+	}
 }
 void MonitorTask::finish(){
 	this->readAllFds();
 	std::string name = ctx.mode == COMPRESS ? "Compressor" : "Descompressor";
-	const char *buff = ctx.mode == COMPRESS ? ctx.compressCom.buffer.data() :
-		ctx.decompressCom.buffer.data();
-	printf("Processo %s finalizou e retornou:\n%s", name.data(), buff);
+	auto buff = ctx.mode == COMPRESS ? ctx.compressCom.buffer :
+		ctx.decompressCom.buffer;
+	std::cout << "Processo " << name << " finalizou e retornou:\n" << buff << std::endl;
 }

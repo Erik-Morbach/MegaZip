@@ -14,7 +14,7 @@ void DecompressorTask::decompress() {
 	std::string word;
 
 	for (char c; in_file.get(c); ++bytes_read) {
-	if (c & 0x80) {
+		if (c & 0x80) {
 			if (!word.empty()) {
 				std::cerr << "Error decompressing file: found code indicator right after word" << std::endl;
 				std::exit(1);
@@ -58,4 +58,10 @@ void DecompressorTask::decompress() {
 	}
 
 	bytes_written = out_file.tellp();
+	std::stringstream ss;
+	ss << "Input size:      " << bytes_read << " bytes\n";
+	ss << "Compressed size: " << bytes_written << " bytes\n";
+	ss << "Ratio:           " << ((bytes_written) / static_cast<double>(bytes_read)) << "x\n";
+	std::string s = ss.str();
+	write(com.fd[1], s.c_str(), s.size());
 }

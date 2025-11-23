@@ -1,4 +1,5 @@
 #pragma once
+#include <unistd.h>
 #include <cctype>
 #include <condition_variable>
 #include <cstdint>
@@ -30,7 +31,7 @@ struct CompressorTask {
 	std::queue<std::string> in_queue;
 	std::queue<char> out_queue;
 
-	uint64_t bytes_read, bytes_written;
+	uint64_t bytes_read =0, bytes_written =0;
 
 	void run();
 	void read();

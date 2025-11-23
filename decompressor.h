@@ -1,4 +1,5 @@
 #pragma once
+#include <unistd.h>
 #include <cctype>
 #include <condition_variable>
 #include <cstdint>
@@ -19,6 +20,6 @@
 
 struct DecompressorTask {
 	IPCData com;
-	uint64_t bytes_read, bytes_written;
+	uint64_t bytes_read = 0, bytes_written = 0;
 	void decompress();
 };

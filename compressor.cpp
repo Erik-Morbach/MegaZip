@@ -1,7 +1,20 @@
 #include "compressor.h"
 
 void CompressorTask::run(){
+	std::thread readThread(&CompressorTask::read, this);
+	std::thread compressThread(&CompressorTask::compress, this);
+	std::thread writeThread(&CompressorTask::write, this);
 
+	readThread.join();
+	compressThread.join();
+	writeThread.join();
+
+	std::stringstream ss;
+	ss << "Input size:      " << bytes_read << " bytes\n";
+	ss << "Compressed size: " << bytes_written << " bytes\n";
+	ss << "Ratio:           " << ((bytes_written) / static_cast<double>(bytes_read)) << "x";
+	std::string s = ss.str();
+	::write(com.fd[1], s.c_str(), s.size());
 }
 void CompressorTask::read() {
 	std::ifstream in_file(com.inputPath.data(), std::ios_base::binary);
@@ -22,7 +35,7 @@ void CompressorTask::read() {
 
 		read_mutex.lock();
 
-	if (!word.empty()) {
+		if (!word.empty()) {
 			in_queue.push(word);
 			word.clear();
 		}
