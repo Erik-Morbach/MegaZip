@@ -10,6 +10,9 @@
 #include "monitor.h"
 
 
+// Nomes: Erik Morbach
+// Lucas Sauer
+// Gabriel Farias
 int main(int argc, const char *argv[]){
 	if (argc != 4) {
 		printf("uso: %s -c|-d entrada.txt saida.txt\n", argv[0]);
